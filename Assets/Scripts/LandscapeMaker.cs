@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
@@ -20,10 +21,12 @@ public class LandscapeMaker : MonoBehaviour
     public float animationSpeedY = 1.0f;
 
     private MeshFilter _meshFilter;
+    private MeshRenderer _renderer;
 
     private void Awake()
     {
         _meshFilter = GetComponent<MeshFilter>();
+        _renderer = GetComponent<MeshRenderer>();
     }
 
     private void Update()
@@ -46,7 +49,8 @@ public class LandscapeMaker : MonoBehaviour
             }
         }
 
-        var submesh = 0;
+        var materialCount = _renderer.materials.Length;
+
         for (var x = 0; x < meshWidth - 1; ++x)
         {
             for (var y = 0; y < meshHeight - 1; ++y)
@@ -56,11 +60,17 @@ public class LandscapeMaker : MonoBehaviour
                 var tr = points[x, y + 1];
                 var tl = points[x + 1, y + 1];
 
-                mb.BuildTriangle(bl, tr, tl, submesh % 6);
-                mb.BuildTriangle(bl, br, tr, submesh % 6);
-            }
+                // Get the average height
+                var average = (tl + tr + bl + br) * .25f;
+                var faceHeight = average.y;
 
-            ++submesh;
+                var heightFraction = Mathf.Clamp(faceHeight / bumpHeight, 0f, 1f);
+                var scaledHeight = Mathf.FloorToInt(heightFraction * (materialCount + 1));
+                var submesh = Mathf.Clamp(scaledHeight, 0, materialCount - 1);
+
+                mb.BuildTriangle(bl, tr, tl, submesh);
+                mb.BuildTriangle(bl, br, tr, submesh);
+            }
         }
 
         _meshFilter.mesh = mb.CreateMesh();
