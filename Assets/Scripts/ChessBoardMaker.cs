@@ -5,9 +5,12 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer))]
 public class ChessBoardMaker : MonoBehaviour
 {
-    public float cellSize = 1f;
-    public int widthCells = 8;
-    public int heightCells = 8;
+    [SerializeField]
+    private float cellSize = 1f;
+    [SerializeField]
+    private int widthCells = 8;
+    [SerializeField]
+    private int heightCells = 8;
 
     private MeshFilter _meshFilter;
     private MeshRenderer _renderer;

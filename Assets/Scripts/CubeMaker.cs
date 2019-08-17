@@ -4,7 +4,8 @@
 [RequireComponent(typeof(MeshRenderer))]
 public class CubeMaker : MonoBehaviour
 {
-    public Vector3 size = Vector3.one;
+    [SerializeField]
+    private Vector3 size = Vector3.one;
 
     private MeshFilter _meshFilter;
 

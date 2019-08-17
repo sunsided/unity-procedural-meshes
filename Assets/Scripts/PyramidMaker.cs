@@ -4,7 +4,8 @@
 [RequireComponent(typeof(MeshRenderer))]
 public class PyramidMaker : MonoBehaviour
 {
-    public float pyramidSize = 5f;
+    [SerializeField]
+    private float pyramidSize = 5f;
 
     private MeshFilter _meshFilter;
 

@@ -5,22 +5,29 @@
 public class LandscapeMaker : MonoBehaviour
 {
     [Header("Area")]
-    public float cellSize = 1f;
+    [SerializeField]
+    private float cellSize = 1f;
 
-    public int width = 50;
-    public int height = 50;
+    [SerializeField]
+    private int width = 50;
+    [SerializeField]
+    private int height = 50;
 
     [Header("Landscape")]
-    public float bumpiness = 5f;
+    [SerializeField]
+    private float bumpiness = 5f;
 
-    public float bumpHeight = 5f;
+    [SerializeField]
+    private float bumpHeight = 5f;
 
     [Header("Animation")]
     [Range(-10f, 10f)]
-    public float animationSpeedX = 1.0f;
+    [SerializeField]
+    private float animationSpeedX = 1.0f;
 
     [Range(-10f, 10f)]
-    public float animationSpeedY = 1.0f;
+    [SerializeField]
+    private float animationSpeedY = 1.0f;
 
     private MeshFilter _meshFilter;
     private MeshRenderer _renderer;

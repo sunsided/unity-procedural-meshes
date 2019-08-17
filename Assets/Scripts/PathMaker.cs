@@ -13,8 +13,10 @@ public class PathShape
 [RequireComponent(typeof(MeshRenderer))]
 public class PathMaker : MonoBehaviour
 {
-    public Transform[] path;
-    public PathShape pathShape;
+    [SerializeField]
+    private Transform[] path;
+    [SerializeField]
+    private PathShape pathShape;
 
     private MeshFilter _meshFilter;
 

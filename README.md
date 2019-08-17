@@ -30,3 +30,7 @@ Shape extrusion along a path defined by
 a set of waypoints.
 
 ![](.readme/procedural-paths.webp)
+
+A similar approach is used to generate a racetrack including walls and a mesh collider:
+
+![](.readme/procedural-racetrack.webp)

@@ -4,7 +4,8 @@
 [RequireComponent(typeof(MeshRenderer))]
 public class PlaneMaker : MonoBehaviour
 {
-    public float cellSize = 1f;
+    [SerializeField]
+    private float cellSize = 1f;
     public int width = 24;
     public int height = 24;
 
