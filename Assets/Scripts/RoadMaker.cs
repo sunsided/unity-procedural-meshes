@@ -56,7 +56,10 @@ public class RoadMaker : MonoBehaviour
             var centerDir = p0.normalized;
             var sample = Mathf.PerlinNoise(wave.x * waveScale, wave.y * waveScale) * waviness;
 
-            points[i] += centerDir * sample;
+            // Somewhat fix the seam between the start and the end of the road.
+            var control = Mathf.PingPong(i, points.Count * 0.5f) / (points.Count * 0.5f);
+
+            points[i] += centerDir * (sample * control);
         }
 
         for (var i = 1; i < points.Count + 1; ++i)
