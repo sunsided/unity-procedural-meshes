@@ -38,8 +38,11 @@ public class MeshBuilder
     public MeshBuilder(int submeshCount)
     {
         if (submeshCount <= 0)
+        {
             throw new ArgumentOutOfRangeException(nameof(submeshCount), submeshCount,
                 "There must be at least one submesh.");
+        }
+
         _submeshIndices = new List<int>[submeshCount];
         for (var i = 0; i < submeshCount; ++i)
         {
