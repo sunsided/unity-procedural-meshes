@@ -8,21 +8,35 @@ using UnityEngine;
 [RequireComponent(typeof(MeshCollider))]
 public class RoadMaker : MonoBehaviour
 {
-    public float radius = 30f;
-    public int segments = 300;
+    [SerializeField]
+    private float radius = 30f;
 
-    public GameObject car;
+    [SerializeField]
+    private int segments = 300;
 
-    public float lineWidth = 0.3f;
-    public float roadWidth = 8f;
-    public float edgeWidth = 1f;
-    public float edgeHeight = 1f;
+    [SerializeField]
+    private float lineWidth = 0.3f;
 
-    public float waviness = 5f;
-    public float waveScale = .1f;
+    [SerializeField]
+    private float roadWidth = 8f;
 
-    public Vector2 waveOffset;
-    public Vector2 waveStep = new Vector2(0.01f, 0.01f);
+    [SerializeField]
+    private float edgeWidth = 1f;
+
+    [SerializeField]
+    private float edgeHeight = 1f;
+
+    [SerializeField]
+    private float waviness = 5f;
+
+    [SerializeField]
+    private float waveScale = .1f;
+
+    [SerializeField]
+    private Vector2 waveOffset;
+
+    [SerializeField]
+    private Vector2 waveStep = new Vector2(0.01f, 0.01f);
 
     private MeshFilter _meshFilter;
     private MeshCollider _meshCollider;
@@ -35,7 +49,12 @@ public class RoadMaker : MonoBehaviour
         _meshCollider = GetComponent<MeshCollider>();
     }
 
-    private void Update()
+    private void Start()
+    {
+        BuildTrack();
+    }
+
+    private void BuildTrack()
     {
         var mb = new MeshBuilder(6);
 
@@ -57,7 +76,8 @@ public class RoadMaker : MonoBehaviour
 
             var p0 = points[i];
             var centerDir = p0.normalized;
-            var sample = Mathf.PerlinNoise(wave.x * waveScale, wave.y * waveScale) * waviness;
+            var sample = Mathf.PerlinNoise(wave.x * waveScale + waveOffset.x, wave.y * waveScale + waveOffset.y) *
+                         waviness;
 
             // Somewhat fix the seam between the start and the end of the road.
             var control = Mathf.PingPong(i, points.Count * 0.5f) / (points.Count * 0.5f);
