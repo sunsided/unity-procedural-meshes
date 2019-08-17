@@ -8,6 +8,7 @@ using UnityEngine;
 [RequireComponent(typeof(MeshCollider))]
 public class RoadMaker : MonoBehaviour
 {
+    [Header("Road dimensions")]
     [SerializeField]
     private float radius = 30f;
 
@@ -26,6 +27,7 @@ public class RoadMaker : MonoBehaviour
     [SerializeField]
     private float edgeHeight = 1f;
 
+    [Header("Shape variation")]
     [SerializeField]
     private float waviness = 5f;
 
@@ -40,21 +42,11 @@ public class RoadMaker : MonoBehaviour
 
     private MeshFilter _meshFilter;
     private MeshCollider _meshCollider;
-
     private bool _stripeCheck;
 
-    private void Awake()
-    {
-        _meshFilter = GetComponent<MeshFilter>();
-        _meshCollider = GetComponent<MeshCollider>();
-    }
+    public bool AutoRebuild { get; set; }
 
-    private void Start()
-    {
-        BuildTrack();
-    }
-
-    private void BuildTrack()
+    public void RebuildTrack()
     {
         var mb = new MeshBuilder(6);
 
@@ -177,4 +169,25 @@ public class RoadMaker : MonoBehaviour
         mb.BuildTriangle(bl, br, tl, submesh);
         mb.BuildTriangle(br, tr, tl, submesh);
     }
+
+    private void Awake()
+    {
+        _meshFilter = GetComponent<MeshFilter>();
+        _meshCollider = GetComponent<MeshCollider>();
+    }
+
+    private void Start()
+    {
+        RebuildTrack();
+    }
+
+#if UNITY_EDITOR
+    private void Update()
+    {
+        if (AutoRebuild && !UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
+        {
+            RebuildTrack();
+        }
+    }
+#endif
 }
