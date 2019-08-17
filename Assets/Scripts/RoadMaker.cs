@@ -27,6 +27,8 @@ public class RoadMaker : MonoBehaviour
     private MeshFilter _meshFilter;
     private MeshCollider _meshCollider;
 
+    private bool _stripeCheck;
+
     private void Awake()
     {
         _meshFilter = GetComponent<MeshFilter>();
@@ -88,20 +90,28 @@ public class RoadMaker : MonoBehaviour
         target = Vector3.forward * roadWidth;
         MakeRoadQuad(mb, pPrev, p0, p1, offset, target, 1);
 
+        var stripeSubmesh = 2;
+        if (_stripeCheck)
+        {
+            stripeSubmesh = 3;
+        }
+
+        _stripeCheck = !_stripeCheck;
+
         // Edge wall inner side
         offset += target;
         target = Vector3.up * edgeHeight;
-        MakeRoadQuad(mb, pPrev, p0, p1, offset, target, 2);
+        MakeRoadQuad(mb, pPrev, p0, p1, offset, target, stripeSubmesh);
 
         // Edge wall top
         offset += target;
         target = Vector3.forward * edgeWidth;
-        MakeRoadQuad(mb, pPrev, p0, p1, offset, target, 2);
+        MakeRoadQuad(mb, pPrev, p0, p1, offset, target, stripeSubmesh);
 
         // Edge wall outer side
         offset += target;
         target = Vector3.down * edgeHeight;
-        MakeRoadQuad(mb, pPrev, p0, p1, offset, target, 2);
+        MakeRoadQuad(mb, pPrev, p0, p1, offset, target, stripeSubmesh);
     }
 
     private void MakeRoadQuad([NotNull] MeshBuilder mb, Vector3 pPrev, Vector3 p0, Vector3 p1, Vector3 offset,
