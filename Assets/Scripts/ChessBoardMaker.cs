@@ -56,19 +56,19 @@ public class ChessBoardMaker : MonoBehaviour
 
         // Generate the points for the plane.
         var points = new Vector3[width, height];
-        for(var x = -halfWidth; x < -halfWidth + width; ++x)
+        for (var x = -halfWidth; x < -halfWidth + width; ++x)
         {
             for (var y = -halfHeight; y < -halfHeight + height; ++y)
             {
                 points[x + halfWidth, y + halfHeight] = new Vector3(
-                    (cellSize * x) + widthOffset,
+                    cellSize * x + widthOffset,
                     0,
-                    (cellSize * y) + heightOffset);
+                    cellSize * y + heightOffset);
             }
         }
 
         // Generate the faces.
-        for(var x = 0; x < width - 1; ++x)
+        for (var x = 0; x < width - 1; ++x)
         {
             for (var y = 0; y < height - 1; ++y)
             {

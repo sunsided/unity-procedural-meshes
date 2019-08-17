@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
@@ -22,7 +21,7 @@ public class PlaneMaker : MonoBehaviour
 
         // Generate the points for the plane.
         var points = new Vector3[width, height];
-        for(var x = 0; x < width; ++x)
+        for (var x = 0; x < width; ++x)
         {
             for (var y = 0; y < height; ++y)
             {
@@ -34,7 +33,7 @@ public class PlaneMaker : MonoBehaviour
         }
 
         var submesh = 0;
-        for(var x = 0; x < width - 1; ++x)
+        for (var x = 0; x < width - 1; ++x)
         {
             for (var y = 0; y < height - 1; ++y)
             {

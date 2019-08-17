@@ -31,10 +31,15 @@ public class MeshBuilder
     ///     Initializes a new instance of the <see cref="MeshBuilder" /> class.
     /// </summary>
     /// <param name="submeshCount">The number of sub-meshes used.</param>
-    /// <exception cref="ArgumentOutOfRangeException">The specified value for <paramref name="submeshCount"/> was non-positive.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     The specified value for <paramref name="submeshCount" /> was
+    ///     non-positive.
+    /// </exception>
     public MeshBuilder(int submeshCount)
     {
-        if (submeshCount <= 0) throw new ArgumentOutOfRangeException(nameof(submeshCount), submeshCount, "There must be at least one submesh.");
+        if (submeshCount <= 0)
+            throw new ArgumentOutOfRangeException(nameof(submeshCount), submeshCount,
+                "There must be at least one submesh.");
         _submeshIndices = new List<int>[submeshCount];
         for (var i = 0; i < submeshCount; ++i)
         {
