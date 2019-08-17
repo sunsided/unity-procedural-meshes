@@ -6,8 +6,8 @@ public class LandscapeMaker : MonoBehaviour
 {
     [Header("Area")]
     public float cellSize = 1f;
-    public int width = 24;
-    public int height = 24;
+    public int width = 50;
+    public int height = 50;
 
     [Header("Landscape")]
     public float bumpiness = 5f;
@@ -29,28 +29,27 @@ public class LandscapeMaker : MonoBehaviour
     private void Update()
     {
         var mb = new MeshBuilder(6);
+        var meshWidth = width + 1;
+        var meshHeight = height + 1;
 
         // Generate the points for the plane.
-        var points = new Vector3[width, height];
-        for (var x = 0; x < width; ++x)
+        var points = new Vector3[meshWidth, meshHeight];
+        for (var x = 0; x < meshWidth; ++x)
         {
-            for (var y = 0; y < height; ++y)
+            for (var y = 0; y < meshHeight; ++y)
             {
-                var perlinX = (x + Time.time * animationSpeedX) * bumpiness * 0.1f;
-                var perlinY = (y + Time.time * animationSpeedY) * bumpiness * 0.1f;
-                var noise = Mathf.PerlinNoise(perlinX, perlinY) * bumpHeight;
-
+                var cellHeight = CalculateHeight(x, y);
                 points[x, y] = new Vector3(
                     cellSize * x,
-                    noise,
+                    cellHeight,
                     cellSize * y);
             }
         }
 
         var submesh = 0;
-        for (var x = 0; x < width - 1; ++x)
+        for (var x = 0; x < meshWidth - 1; ++x)
         {
-            for (var y = 0; y < height - 1; ++y)
+            for (var y = 0; y < meshHeight - 1; ++y)
             {
                 var br = points[x, y];
                 var bl = points[x + 1, y];
@@ -65,5 +64,21 @@ public class LandscapeMaker : MonoBehaviour
         }
 
         _meshFilter.mesh = mb.CreateMesh();
+    }
+
+    private float CalculateHeight(int x, int y)
+    {
+        var position = transform.position;
+
+        // We can independently animate the noise along the X and Y axes.
+        var perlinAnimX = Time.time * animationSpeedX;
+        var perlinAnimY = Time.time * animationSpeedY;
+
+        // By offsetting the noise coordinates with the position we're able
+        // to tile the landscape, resulting in a reduced triangle count per instance.
+        var perlinX = (x + perlinAnimX + position.x) * bumpiness * 0.1f;
+        var perlinY = (y + perlinAnimY + position.z) * bumpiness * 0.1f;
+
+        return Mathf.PerlinNoise(perlinX, perlinY) * bumpHeight;
     }
 }
