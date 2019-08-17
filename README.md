@@ -22,4 +22,11 @@ One of the more interesting approaches here, it mainly uses
 - Mesh ready for tiling (due to transform awareness) and
 - Height-based submesh assignment.
 
-![](.readme/procedural-landscape.png)
+![](.readme/procedural-landscape.webp)
+
+## Procedural path generation
+
+Shape extrusion along a path defined by
+a set of waypoints.
+
+![](.readme/procedural-paths.webp)
