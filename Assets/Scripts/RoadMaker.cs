@@ -64,27 +64,55 @@ public class RoadMaker : MonoBehaviour
         MakeRoadQuad(mb, pPrev, p0, p1, offset, target, 0);
 
         // Road
-        offset = target;
+        offset += target;
         target = Vector3.forward * roadWidth;
         MakeRoadQuad(mb, pPrev, p0, p1, offset, target, 1);
+
+        // Edge
+        offset += target;
+        target = Vector3.forward * edgeWidth;
+        MakeRoadQuad(mb, pPrev, p0, p1, offset, target, 2);
     }
 
     private void MakeRoadQuad([NotNull] MeshBuilder mb, Vector3 pPrev, Vector3 p0, Vector3 p1, Vector3 offset, Vector3 targetOffset, int submesh)
     {
         var forward = (p1 - p0).normalized;
+        var forwardPrev = (p0 - pPrev).normalized;
 
-        // Determine the orthogonal direction.
+        // Outer side of the road
         var perpendicular = Quaternion.LookRotation(
             Vector3.Cross(forward, Vector3.up)
         );
 
-        var tl = p0 + (perpendicular * offset);
-        var tr = p0 + (perpendicular * (offset + targetOffset));
+        var perpendicularPrev = Quaternion.LookRotation(
+            Vector3.Cross(forwardPrev, Vector3.up)
+        );
+
+        var tl = p0 + (perpendicularPrev * offset);
+        var tr = p0 + (perpendicularPrev * (offset + targetOffset));
 
         var bl = p1 + (perpendicular * offset);
         var br = p1 + (perpendicular * (offset + targetOffset));
 
         mb.BuildTriangle(tl, tr, bl, submesh);
         mb.BuildTriangle(tr, br, bl, submesh);
+
+        // Inner side of the road
+        perpendicular = Quaternion.LookRotation(
+            Vector3.Cross(-forward, Vector3.up)
+        );
+
+        perpendicularPrev = Quaternion.LookRotation(
+            Vector3.Cross(-forwardPrev, Vector3.up)
+        );
+
+        tl = p0 + (perpendicularPrev * offset);
+        tr = p0 + (perpendicularPrev * (offset + targetOffset));
+
+        bl = p1 + (perpendicular * offset);
+        br = p1 + (perpendicular * (offset + targetOffset));
+
+        mb.BuildTriangle(bl, br, tl, submesh);
+        mb.BuildTriangle(br, tr, tl, submesh);
     }
 }
