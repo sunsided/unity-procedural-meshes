@@ -26,7 +26,10 @@ public class PlaneMaker : MonoBehaviour
         {
             for (var y = 0; y < height; ++y)
             {
-                points[x, y] = new Vector3(cellSize * x, 0, cellSize * y);
+                points[x, y] = new Vector3(
+                    cellSize * x,
+                    Mathf.PingPong(x, 10),
+                    cellSize * y);
             }
         }
 
