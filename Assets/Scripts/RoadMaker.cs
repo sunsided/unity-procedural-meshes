@@ -87,9 +87,19 @@ public class RoadMaker : MonoBehaviour
         target = Vector3.forward * roadWidth;
         MakeRoadQuad(mb, pPrev, p0, p1, offset, target, 1);
 
-        // Edge
+        // Edge wall inner side
+        offset += target;
+        target = Vector3.up * edgeHeight;
+        MakeRoadQuad(mb, pPrev, p0, p1, offset, target, 2);
+
+        // Edge wall top
         offset += target;
         target = Vector3.forward * edgeWidth;
+        MakeRoadQuad(mb, pPrev, p0, p1, offset, target, 2);
+
+        // Edge wall outer side
+        offset += target;
+        target = Vector3.down * edgeHeight;
         MakeRoadQuad(mb, pPrev, p0, p1, offset, target, 2);
     }
 
@@ -99,6 +109,7 @@ public class RoadMaker : MonoBehaviour
         var forward = (p1 - p0).normalized;
         var forwardPrev = (p0 - pPrev).normalized;
 
+        // Outer side of the road
         var perpendicular = Quaternion.LookRotation(
             Vector3.Cross(forward, Vector3.up)
         );
@@ -107,7 +118,6 @@ public class RoadMaker : MonoBehaviour
             Vector3.Cross(forwardPrev, Vector3.up)
         );
 
-        // Outer side of the road
         var tl = p0 + perpendicularPrev * offset;
         var tr = p0 + perpendicularPrev * (offset + targetOffset);
 
@@ -118,11 +128,19 @@ public class RoadMaker : MonoBehaviour
         mb.BuildTriangle(tr, br, bl, submesh);
 
         // Inner side of the road
-        tl = p0 - perpendicularPrev * offset;
-        tr = p0 - perpendicularPrev * (offset + targetOffset);
+        perpendicular = Quaternion.LookRotation(
+            Vector3.Cross(-forward, Vector3.up)
+        );
 
-        bl = p1 - perpendicular * offset;
-        br = p1 - perpendicular * (offset + targetOffset);
+        perpendicularPrev = Quaternion.LookRotation(
+            Vector3.Cross(-forwardPrev, Vector3.up)
+        );
+
+        tl = p0 + perpendicularPrev * offset;
+        tr = p0 + perpendicularPrev * (offset + targetOffset);
+
+        bl = p1 + perpendicular * offset;
+        br = p1 + perpendicular * (offset + targetOffset);
 
         // Note that we needed to flip the rendering order.
         mb.BuildTriangle(bl, br, tl, submesh);
