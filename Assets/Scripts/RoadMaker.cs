@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
+﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -19,6 +16,12 @@ public class RoadMaker : MonoBehaviour
     public float roadWidth = 8f;
     public float edgeWidth = 1f;
     public float edgeHeight = 1f;
+
+    public float waviness = 5f;
+    public float waveScale = .1f;
+
+    public Vector2 waveOffset;
+    public Vector2 waveStep = new Vector2(0.01f, 0.01f);
 
     private MeshFilter _meshFilter;
     private MeshCollider _meshCollider;
@@ -41,6 +44,19 @@ public class RoadMaker : MonoBehaviour
             var distance = Vector3.forward * radius;
             var point = Quaternion.AngleAxis(degrees, Vector3.up) * distance;
             points.Add(point);
+        }
+
+        // Apply noise.
+        var wave = waveOffset;
+        for (var i = 0; i < points.Count; ++i)
+        {
+            wave += waveStep;
+
+            var p0 = points[i];
+            var centerDir = p0.normalized;
+            var sample = Mathf.PerlinNoise(wave.x * waveScale, wave.y * waveScale) * waviness;
+
+            points[i] += centerDir * sample;
         }
 
         for (var i = 1; i < points.Count + 1; ++i)
@@ -74,12 +90,12 @@ public class RoadMaker : MonoBehaviour
         MakeRoadQuad(mb, pPrev, p0, p1, offset, target, 2);
     }
 
-    private void MakeRoadQuad([NotNull] MeshBuilder mb, Vector3 pPrev, Vector3 p0, Vector3 p1, Vector3 offset, Vector3 targetOffset, int submesh)
+    private void MakeRoadQuad([NotNull] MeshBuilder mb, Vector3 pPrev, Vector3 p0, Vector3 p1, Vector3 offset,
+        Vector3 targetOffset, int submesh)
     {
         var forward = (p1 - p0).normalized;
         var forwardPrev = (p0 - pPrev).normalized;
 
-        // Outer side of the road
         var perpendicular = Quaternion.LookRotation(
             Vector3.Cross(forward, Vector3.up)
         );
@@ -88,30 +104,24 @@ public class RoadMaker : MonoBehaviour
             Vector3.Cross(forwardPrev, Vector3.up)
         );
 
-        var tl = p0 + (perpendicularPrev * offset);
-        var tr = p0 + (perpendicularPrev * (offset + targetOffset));
+        // Outer side of the road
+        var tl = p0 + perpendicularPrev * offset;
+        var tr = p0 + perpendicularPrev * (offset + targetOffset);
 
-        var bl = p1 + (perpendicular * offset);
-        var br = p1 + (perpendicular * (offset + targetOffset));
+        var bl = p1 + perpendicular * offset;
+        var br = p1 + perpendicular * (offset + targetOffset);
 
         mb.BuildTriangle(tl, tr, bl, submesh);
         mb.BuildTriangle(tr, br, bl, submesh);
 
         // Inner side of the road
-        perpendicular = Quaternion.LookRotation(
-            Vector3.Cross(-forward, Vector3.up)
-        );
+        tl = p0 - perpendicularPrev * offset;
+        tr = p0 - perpendicularPrev * (offset + targetOffset);
 
-        perpendicularPrev = Quaternion.LookRotation(
-            Vector3.Cross(-forwardPrev, Vector3.up)
-        );
+        bl = p1 - perpendicular * offset;
+        br = p1 - perpendicular * (offset + targetOffset);
 
-        tl = p0 + (perpendicularPrev * offset);
-        tr = p0 + (perpendicularPrev * (offset + targetOffset));
-
-        bl = p1 + (perpendicular * offset);
-        br = p1 + (perpendicular * (offset + targetOffset));
-
+        // Note that we needed to flip the rendering order.
         mb.BuildTriangle(bl, br, tl, submesh);
         mb.BuildTriangle(br, tr, tl, submesh);
     }

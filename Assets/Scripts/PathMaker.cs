@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -62,7 +61,7 @@ public class PathMaker : MonoBehaviour
 
         for (var i = 0; i < shape.Length; ++i)
         {
-            translatedShape[i] = (forwardRotation * shape[i]) + position;
+            translatedShape[i] = forwardRotation * shape[i] + position;
         }
 
         return translatedShape;

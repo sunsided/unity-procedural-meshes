@@ -243,13 +243,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc0691fed1526bbf0878b529dd5714c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 30
+  radius: 100
   segments: 300
   car: {fileID: 0}
   lineWidth: 0.3
   roadWidth: 8
   edgeWidth: 1
   edgeHeight: 1
+  waviness: 100
+  waveScale: 2.5
+  waveOffset: {x: 0, y: 0}
+  waveStep: {x: 0.01, y: 0.01}
 --- !u!64 &440266350
 MeshCollider:
   m_ObjectHideFlags: 0
