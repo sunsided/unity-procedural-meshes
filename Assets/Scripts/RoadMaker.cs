@@ -2,6 +2,7 @@
 using JetBrains.Annotations;
 using UnityEngine;
 
+[ExecuteInEditMode]
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshCollider))]
@@ -72,7 +73,7 @@ public class RoadMaker : MonoBehaviour
         }
 
         _meshFilter.mesh = mb.CreateMesh();
-        _meshCollider.sharedMesh = _meshFilter.mesh;
+        _meshCollider.sharedMesh = _meshFilter.sharedMesh;
     }
 
     private void ExtrudeRoad(MeshBuilder mb, Vector3 pPrev, Vector3 p0, Vector3 p1)
