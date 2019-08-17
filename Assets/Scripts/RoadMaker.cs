@@ -48,8 +48,17 @@ public class RoadMaker : MonoBehaviour
 
     public void RebuildTrack()
     {
-        var mb = new MeshBuilder(6);
+        var points = MakeCircleBasedTrack();
 
+        var mesh = CreateMesh(points);
+
+        _meshFilter.mesh = mesh;
+        _meshCollider.sharedMesh = _meshFilter.sharedMesh;
+    }
+
+    [NotNull]
+    private List<Vector3> MakeCircleBasedTrack()
+    {
         var numberWaypoints = segments;
         var segmentDegrees = 360f / numberWaypoints;
         var points = new List<Vector3>();
@@ -60,7 +69,14 @@ public class RoadMaker : MonoBehaviour
             points.Add(point);
         }
 
-        // Apply noise.
+        ApplyVariation(points);
+
+        return points;
+    }
+
+    private void ApplyVariation<T>([NotNull] T points)
+        where T : IList<Vector3>
+    {
         var wave = waveOffset;
         for (var i = 0; i < points.Count; ++i)
         {
@@ -76,7 +92,12 @@ public class RoadMaker : MonoBehaviour
 
             points[i] += centerDir * (sample * control);
         }
+    }
 
+    private Mesh CreateMesh<T>([NotNull] T points)
+        where T : IList<Vector3>
+    {
+        var mb = new MeshBuilder(6);
         for (var i = 1; i < points.Count + 1; ++i)
         {
             var pPrev = points[i - 1];
@@ -86,8 +107,8 @@ public class RoadMaker : MonoBehaviour
             ExtrudeRoad(mb, pPrev, p0, p1);
         }
 
-        _meshFilter.mesh = mb.CreateMesh();
-        _meshCollider.sharedMesh = _meshFilter.sharedMesh;
+        var mesh = mb.CreateMesh();
+        return mesh;
     }
 
     private void ExtrudeRoad(MeshBuilder mb, Vector3 pPrev, Vector3 p0, Vector3 p1)
