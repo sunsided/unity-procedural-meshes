@@ -1,5 +1,4 @@
-﻿using System;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
@@ -11,20 +10,26 @@ public class ChessBoardMaker : MonoBehaviour
     public int heightCells = 8;
 
     private MeshFilter _meshFilter;
+    private MeshRenderer _renderer;
 
     private void Awake()
     {
         _meshFilter = GetComponent<MeshFilter>();
+        _renderer = GetComponent<MeshRenderer>();
     }
 
     private void Update()
     {
-        if (widthCells <= 0 || heightCells <= 0)
+        // Skip a zero-sized board.
+        var hasCells = widthCells > 0 && heightCells > 0;
+        _renderer.enabled = hasCells;
+        if (!hasCells)
         {
             return;
         }
 
-        var mb = new MeshBuilder(6);
+        // Render the board.
+        var mb = new MeshBuilder(2);
         CreateChessBoard(mb);
         _meshFilter.mesh = mb.CreateMesh();
     }
@@ -42,8 +47,12 @@ public class ChessBoardMaker : MonoBehaviour
         var halfHeight = Mathf.CeilToInt(height * 0.5f);
 
         // If the number of cells is odd, we need to adjust for an extra half of a cell.
-        var widthOffset = (width & 1) == 0 ? halfCellSize : cellSize;
-        var heightOffset = (height & 1) == 0 ? halfCellSize : cellSize;
+        // We're making use of the fact here that width is an integer: The binary and
+        // with 1 isolates the last bit, thus testing whether the value is even (if 0), or odd (if 1).
+        // Since it the result of the operation is an integer, we can use it to multiply it in,
+        // creating a branch-less version of a check for a half or full (i.e., 2x half) offset.
+        var widthOffset = halfCellSize + (width & 1) * halfCellSize;
+        var heightOffset = halfCellSize + (height & 1) * halfCellSize;
 
         // Generate the points for the plane.
         var points = new Vector3[width, height];
@@ -63,13 +72,12 @@ public class ChessBoardMaker : MonoBehaviour
         {
             for (var y = 0; y < height - 1; ++y)
             {
-                var submesh = (x + y) & 1;
-
                 var br = points[x, y];
                 var bl = points[x + 1, y];
                 var tr = points[x, y + 1];
                 var tl = points[x + 1, y + 1];
 
+                var submesh = (x + y) & 1;
                 mb.BuildTriangle(bl, tr, tl, submesh);
                 mb.BuildTriangle(bl, br, tr, submesh);
             }
