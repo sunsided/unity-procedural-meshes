@@ -1,6 +1,13 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using UnityEditor;
 using UnityEngine;
+
+public enum TrackShape
+{
+    Circle,
+    Advanced
+}
 
 [ExecuteInEditMode]
 [RequireComponent(typeof(MeshFilter))]
@@ -8,6 +15,10 @@ using UnityEngine;
 [RequireComponent(typeof(MeshCollider))]
 public class RoadMaker : MonoBehaviour
 {
+    [Header("Track shape")]
+    [SerializeField]
+    private TrackShape generator = TrackShape.Circle;
+
     [Header("Road dimensions")]
     [SerializeField]
     private float radius = 30f;
@@ -40,6 +51,16 @@ public class RoadMaker : MonoBehaviour
     [SerializeField]
     private Vector2 waveStep = new Vector2(0.01f, 0.01f);
 
+    [Header("Advances track shape")]
+    [SerializeField]
+    private float stepLength = 1f;
+
+    [SerializeField]
+    private float stepMaxAngle = 1f;
+
+    [SerializeField]
+    private int shapeSides = 3;
+
     private MeshFilter _meshFilter;
     private MeshCollider _meshCollider;
     private bool _stripeCheck;
@@ -48,7 +69,9 @@ public class RoadMaker : MonoBehaviour
 
     public void RebuildTrack()
     {
-        var points = MakeCircleBasedTrack();
+        var points = generator == TrackShape.Circle
+            ? MakeCircleBasedTrack()
+            : MakeAdvancedTrack(shapeSides);
 
         var mesh = CreateMesh(points);
 
@@ -72,6 +95,69 @@ public class RoadMaker : MonoBehaviour
         ApplyVariation(points);
 
         return points;
+    }
+
+    /// <summary>
+    ///     Builds a more realistic track.
+    /// </summary>
+    /// <remarks>
+    ///     Note that this code is taken straight from Oliver Carson and only updated a bit for style.
+    ///     It does not function entirely correct in that it generates self-crossing tracks,
+    ///     but the results are looking amazing in comparison to the circle-based approach.
+    /// </remarks>
+    [NotNull]
+    private List<Vector3> MakeAdvancedTrack(int sides)
+    {
+        // Create a point list of 4 corners;
+        var points = new List<Vector3>(sides + 1);
+
+        // Create shape corners.
+        for (var i = 0; i < sides; i++)
+        {
+            var forwardVector = Vector3.forward * radius;
+            var point = Quaternion.AngleAxis(90 * i, Vector3.up) * forwardVector;
+            points.Add(point);
+        }
+
+        // Add a random point of variance.
+        var vector = Vector3.forward * (radius * 0.5f);
+        var randomPoint = Quaternion.AngleAxis(90f * Random.Range(0, 10) + 45f, Vector3.up) * vector;
+        points.Insert(Random.Range(0, points.Count), randomPoint);
+
+        ApplyVariation(points);
+
+        // Create a traverser to create multiple points along the line, and to widen turns.
+        var dividePoints = new List<Vector3>();
+
+        var dir = (points[points.Count - 1] - points[points.Count - 2]).normalized;
+        var traversePoint = points[0];
+
+        // Get a corner and the target corner, and keep doing that till all sides built,
+        // do this several times to smooth out the shape.
+        for (var j = 0; j < 6; ++j)
+        {
+            dividePoints.Clear();
+
+            for (var i = 0; i < points.Count; ++i)
+            {
+                var c0 = points[i];
+                var c1 = points[(i + 1) % points.Count];
+                float traverseDist = 0;
+
+                while (traverseDist < Vector3.Distance(c0, c1))
+                {
+                    traverseDist += stepLength;
+                    traversePoint += dir * stepLength;
+                    dividePoints.Add(traversePoint);
+                    dir = Quaternion.RotateTowards(
+                              Quaternion.LookRotation(dir),
+                              Quaternion.LookRotation((c1 - traversePoint).normalized),
+                              stepMaxAngle) * Vector3.forward;
+                }
+            }
+        }
+
+        return dividePoints;
     }
 
     private void ApplyVariation<T>([NotNull] T points)
@@ -205,7 +291,7 @@ public class RoadMaker : MonoBehaviour
 #if UNITY_EDITOR
     private void Update()
     {
-        if (AutoRebuild && !UnityEditor.EditorApplication.isPlayingOrWillChangePlaymode)
+        if (AutoRebuild && !EditorApplication.isPlayingOrWillChangePlaymode)
         {
             RebuildTrack();
         }

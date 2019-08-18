@@ -7,8 +7,10 @@ public class ChessBoardMaker : MonoBehaviour
 {
     [SerializeField]
     private float cellSize = 1f;
+
     [SerializeField]
     private int widthCells = 8;
+
     [SerializeField]
     private int heightCells = 8;
 

@@ -10,6 +10,7 @@ public class LandscapeMaker : MonoBehaviour
 
     [SerializeField]
     private int width = 50;
+
     [SerializeField]
     private int height = 50;
 

@@ -6,6 +6,7 @@ public class PlaneMaker : MonoBehaviour
 {
     [SerializeField]
     private float cellSize = 1f;
+
     public int width = 24;
     public int height = 24;
 

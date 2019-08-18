@@ -15,6 +15,7 @@ public class PathMaker : MonoBehaviour
 {
     [SerializeField]
     private Transform[] path;
+
     [SerializeField]
     private PathShape pathShape;
 
